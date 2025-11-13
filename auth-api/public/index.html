@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>通信テスト</title>
+  </head>
+  <body>
+    <h1>バックエンド通信テスト</h1>
+    <button onclick="testConnection()">通信テスト</button>
+    <p id="result"></p>
+    <script>
+      async function testConnection() {
+        const response = await fetch("/api/hello");
+        const data = await response.json();
+        document.getElementById("result").textContent = data.message;
+      }
+    </script>
+  </body>
+</html>

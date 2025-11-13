@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Books {
+  id            Int     @id @default(autoincrement())
+  title         String  @db.VarChar(255)
+  author        String  @db.VarChar(100)
+  genre         String? @db.VarChar(50)
+  publishedYear Int?    @map("published_year")
+
+  @@map("books")
+}
+
+// ユーザー情報テーブル
+model User {
+  id        Int      @id @default(autoincrement()) // 主キー
+  email     String   @unique // ログインID（重複不可）
+  password  String // ハッシュ化されたパスワード
+  name      String? // ユーザー名（オプション）
+
+  // リレーション：このユーザーが作成したメモ一覧
+  memos     Memo[]   @relation("UserMemos") 
+}
+
+// メモ情報テーブル
+model Memo {
+  id        Int      @id @default(autoincrement()) // 主キー
+  title     String
+  content   String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 外部キー：このメモを作成したユーザー
+  authorId  Int
+  author    User     @relation("UserMemos", fields: [authorId], references: [id])
+}
+
+
+
