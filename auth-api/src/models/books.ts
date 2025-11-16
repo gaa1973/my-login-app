@@ -1,5 +1,5 @@
 import {databaseManager} from "@/db";
-import {searchUsers} from "@/models/user";
+//import {searchUsers} from "@/models/user";
 
 export const getBooks = async () => {
   const prisma = databaseManager.getInstance();

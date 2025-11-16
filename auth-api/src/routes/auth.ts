@@ -2,20 +2,24 @@
 import express from "express";
 import {searchUsers, createUser} from "@/models/user";
 import {hashPassword, comparePassword} from "@/utils/auth";
+import authMiddleware from "@/middleware/auth.middleware";
+
 import jwt from "jsonwebtoken";
 const router = express.Router();
 // user
-app.get("/api/protected", authMiddleware, (req, res) => {
+router.get("/protected", authMiddleware, (req, res) => {
   // req.user が入っている前提
   res.json({ok: true, user: req.user});
 });
 
-app.post("/api/login", async (req, res) => {
+router.post("/login", async (req, res) => {
   const {email, password} = req.body;
-  console.log(typeof email, email);
+  console.log("[LOGIN] Request received for:", email);
 
   // データベースからユーザー情報を取得
+  console.log("[LOGIN] Searching for user in DB...");
   const data = await searchUsers(email);
+  console.log("[LOGIN] DB search complete. User found:", !!data);
 
   if (!data) {
     console.log("ユーザー未登録");
@@ -34,9 +38,10 @@ app.post("/api/login", async (req, res) => {
   }
 
   // ログイン成功
-  const payload = {email};
+  const payload = {id: data.id, email: data.email};
   const token = jwt.sign(payload, process.env.JWT_SECRET);
 
+  // セキュアなクッキーにトークンを保存
   res.cookie("token", token, {
     httpOnly: false,
     //    secure: process.env.NODE_ENV === "production", // 本番では true
@@ -55,10 +60,11 @@ app.post("/api/login", async (req, res) => {
   //   path: "/",
   // });
 
+  console.log("[LOGIN] Sending success response.");
   return res.json({message: "ログイン成功server"});
 });
 
-app.post("/api/Registration", async (req, res) => {
+router.post("/registration", async (req, res) => {
   const {email, password} = req.body;
   console.log(typeof email, email);
 
@@ -76,59 +82,30 @@ app.post("/api/Registration", async (req, res) => {
 
   const data = await createUser(email, hashedPassword);
 
-  res.status(201).json(data);
+  // 新規登録成功後、そのままログイン処理を行う
+  if (!process.env.JWT_SECRET) {
+    return res
+      .status(500)
+      .json({message: "サーバー設定エラー（JWT_SECRET未設定）"});
+  }
+  const payload = {id: data.id, email: data.email};
+  const token = jwt.sign(payload, process.env.JWT_SECRET);
+
+  res.cookie("token", token, {
+    httpOnly: false,
+    secure: false,
+    sameSite: "lax",
+    maxAge: 1000 * 60 * 60, // 1時間
+    path: "/",
+  });
+
+  res
+    .status(201)
+    .json({message: "新規登録とログインに成功しました", user: data});
 });
 
-app.get("/api/hello", (req, res) => {
-  res.json({message: "Hello from backend!"});
-});
-
-// GET /api/booksへのリクエスト時、getBooksが実行される
-app.get("/api/books", async (req, res) => {
-  const data = await getBooks();
-
-  res.json(data);
-});
-
-// GET /api/books/searchへのリクエスト時、searchBooksが実行される
-app.get("/api/books/search", async (req, res) => {
-  const title = req.query.title as string;
-  const data = await searchBooks(title);
-
-  res.json(data);
-});
-
-// GET /api/books/:idへのリクエスト時、getBookByIdが実行される
-app.get("/api/books/:id", async (req, res) => {
-  const id = Number(req.params.id);
-  const data = await getBookById(id);
-
-  res.json(data);
-});
-
-// POST /api/booksへのリクエスト時、createBookが実行される
-app.post("/api/books", async (req, res) => {
-  const {title, author, genre, publishedYear} = req.body;
-  const data = await createBook(title, author, genre, publishedYear);
-
-  res.status(201).json(data);
-});
-
-// PATCH /api/books/:idへのリクエスト時、updateBookが実行される
-app.patch("/api/books/:id", async (req, res) => {
-  const id = Number(req.params.id);
-  const {title} = req.body;
-  const data = await updateBook(id, title);
-
-  res.status(200).json(data);
-});
-
-// DELETE /api/books/:idへのリクエスト時、deleteBookが実行される
-app.delete("/api/books/:id", async (req, res) => {
-  const id = Number(req.params.id);
-  const data = await deleteBook(id);
-
-  res.status(200).json(data);
-});
+// router.get("/hello", (req, res) => {
+//   res.json({message: "Hello from backend!"});
+// });
 
 export default router;

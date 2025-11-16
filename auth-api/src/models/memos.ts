@@ -1,4 +1,5 @@
 import {databaseManager} from "@/db";
+import type {Memo} from "@prisma/client";
 
 export const createMemo = (title: string, content: string, authorId: number) =>
   databaseManager.getInstance().memo.create({data: {title, content, authorId}});
@@ -14,7 +15,8 @@ export const getMemoById = (id: number) =>
 export const updateMemo = (
   id: number,
   data: {title?: string; content?: string},
-) => databaseManager.getInstance().memo.update({where: {id}, data});
+): Promise<Memo> =>
+  databaseManager.getInstance().memo.update({where: {id}, data});
 
-export const deleteMemo = (id: number) =>
+export const deleteMemo = (id: number): Promise<Memo> =>
   databaseManager.getInstance().memo.delete({where: {id}});
