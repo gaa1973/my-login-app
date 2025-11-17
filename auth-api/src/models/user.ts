@@ -1,11 +1,12 @@
 import {databaseManager} from "@/db";
 
+// Userテーブルから全件取得
 export const getUsers = async () => {
   const prisma = databaseManager.getInstance();
   return await prisma.user.findMany();
 };
 
-// Userテーブルからpasswordを検索
+// Userテーブルからemailをキーにpasswordを検索
 export const searchUsers = async (email: string) => {
   const prisma = databaseManager.getInstance();
 

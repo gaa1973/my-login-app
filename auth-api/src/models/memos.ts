@@ -1,22 +1,43 @@
+// src/models/memos.ts
 import {databaseManager} from "@/db";
-import type {Memo} from "@prisma/client";
 
-export const createMemo = (title: string, content: string, authorId: number) =>
-  databaseManager.getInstance().memo.create({data: {title, content, authorId}});
+/**
+ * 指定ユーザーのメモを取得
+ */
+export const getMemosByAuthorId = async (authorId: number) => {
+  const prisma = databaseManager.getInstance();
+  return await prisma.memo.findMany({
+    where: {authorId},
+    orderBy: {createdAt: "desc"},
+  });
+};
 
-export const getMemosByAuthor = (authorId: number) =>
-  databaseManager
-    .getInstance()
-    .memo.findMany({where: {authorId}, orderBy: {createdAt: "desc"}});
+/**
+ * 新しいメモを作成
+ */
+export const createMemo = async (
+  title: string,
+  content: string,
+  authorId: number,
+) => {
+  const prisma = databaseManager.getInstance();
+  return await prisma.memo.create({
+    data: {title, content, authorId},
+  });
+};
 
-export const getMemoById = (id: number) =>
-  databaseManager.getInstance().memo.findUnique({where: {id}});
+/**
+ * IDでメモ取得
+ */
+export const getMemoById = async (id: number) => {
+  const prisma = databaseManager.getInstance();
+  return await prisma.memo.findUnique({where: {id}});
+};
 
-export const updateMemo = (
-  id: number,
-  data: {title?: string; content?: string},
-): Promise<Memo> =>
-  databaseManager.getInstance().memo.update({where: {id}, data});
-
-export const deleteMemo = (id: number): Promise<Memo> =>
-  databaseManager.getInstance().memo.delete({where: {id}});
+/**
+ * メモを削除
+ */
+export const deleteMemo = async (id: number) => {
+  const prisma = databaseManager.getInstance();
+  return await prisma.memo.delete({where: {id}});
+};

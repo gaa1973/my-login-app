@@ -1,22 +1,9 @@
 import express from "express";
 import "express-async-errors"; // 非同期エラーハンドリングのために必須
 import cors from "cors";
-// import {
-//   getBooks,
-//   searchBooks,
-//   getBookById,
-//   createBook,
-//   updateBook,
-//   deleteBook,
-// } from "../models/books";
-// import {searchUsers, createUser} from "../models/user";
-// import {hashPassword, comparePassword} from "../utils/auth";
-// import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
-// import authMiddleware from "../middleware/auth.middleware"; // JWT認証ミドルウェアをインポート
 import authRouter from "./routes/auth";
 import memosRouter from "./routes/memos";
-import booksRouter from "./routes/books";
 
 export const app = express();
 
@@ -28,4 +15,11 @@ app.use(express.static("public"));
 app.use(cookieParser());
 app.use("/api/auth", authRouter);
 app.use("/api/memos", memosRouter);
-app.use("/api/books", booksRouter);
+
+// 末尾に追加
+export const runServer = (port: number = Number(process.env.PORT) || 4000) => {
+  const server = app.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
+  });
+  return server;
+};
