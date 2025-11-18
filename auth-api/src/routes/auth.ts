@@ -14,4 +14,7 @@ router.post("/registration", AuthController.register);
 // GET /api/auth/me
 router.get("/me", authMiddleware, AuthController.getCurrentUser);
 
+// POST /api/auth/logout
+router.post("/logout", AuthController.logout);
+
 export default router;

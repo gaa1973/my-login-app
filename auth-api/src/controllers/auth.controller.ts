@@ -61,3 +61,16 @@ export const login = async (
 export const getCurrentUser = (req: Request, res: Response) => {
   res.json({ok: true, user: req.user});
 };
+
+export const logout = async (req: Request, res: Response) => {
+  try {
+    // クッキーに token がある場合は削除する
+    res.clearCookie("token");
+    return res.json({success: true, message: "ログアウトしました"});
+  } catch (err) {
+    console.error("logout error", err);
+    return res
+      .status(500)
+      .json({message: "ログアウト処理中にエラーが発生しました"});
+  }
+};
