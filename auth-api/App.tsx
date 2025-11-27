@@ -11,7 +11,7 @@ function App() {
   const [message, setMessage] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // 認証状態を確認中かどうかのローディング状態
-  const {request: logoutRequest} = useApi();
+  const {request: logoutRequest} = useApi();  // useApiフックを呼び出し、logoutRequestを取得
 
   // アプリケーションの初回読み込み時にログイン状態を確認する
   useEffect(() => {
