@@ -9,3 +9,5 @@ my-login-app/.DS_Store
 node_modules/
 .DS_Store
 .env
+.auth-api/.env
+.auth-api/.env.test
