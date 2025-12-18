@@ -1,0 +1,11 @@
+# frontend
+my-login-app/node_modules/
+my-login-app/build/
+my-login-app/dist/
+my-login-app/.env
+my-login-app/.DS_Store
+
+# general
+node_modules/
+.DS_Store
+.env
